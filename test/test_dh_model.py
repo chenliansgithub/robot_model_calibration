@@ -1,6 +1,8 @@
 
 import numpy as np
 import math
+import pandas as pd
+import requests
 
 from robot_model_calibration import dh_model
 
@@ -37,7 +39,7 @@ theta0 = [0,-np.pi/2,0,0,0,np.pi]
 d = [430,0,0,699.0476,0,115]
 a = [164.8701,549.6765,212.9389,0,0,0]
 alpha = [-np.pi/2,0,-np.pi/2,np.pi/2,-np.pi/2,0]
-beta = 0
+beta = [0,0,0,0,0,0]
 
 # 4个不同位置对应的FCS
 # [X,Y,Z,A,B,C]
@@ -54,6 +56,7 @@ theta = [
         [34.9356,0.9188,-7.6252,18.5939,82.0907,1.8525]
         ]
 
+ 
 # 计算某个具体位置的D-H参数
 # rad -> degree
 for i in range(len(theta)):
@@ -86,15 +89,38 @@ for i in range(len(dist)):
 res_from_demonstrator =[[922.0875,-145.6793,1180.3197,166.1238,34.0793,-178.2910],
       [1030.2471,144.0002,911.4438,165.1315,4.0287,173.5588],
       [733.7601,254.3910,1308.4939,-172.4536,28.1774,161.1763],
-      [690.5761,528.7902,1167.3499,-149.4596,13.5819,160.5021]
+      [693.5761,528.7902,1167.3499,-149.4596,13.5819,160.5021]
       ]
-print(dist)
-print(calc_model)
+# df_1 = pd.DataFrame(res_from_demonstrator)
+# df_1.to_excel('data/excel/pos_from_demonstrator.xlsx') 
+
+# print(dist)
+# print(calc_model)
 should_be_zero = []
 for i in range(len(calc_model)):
     should_be_zero.append([i - j for i,j in zip(calc_model[i], res_from_demonstrator[i])])
-print(should_be_zero)
 
+should_be_zero = np.array(should_be_zero)
+np.set_printoptions(precision= 6, suppress=True)
+# print(should_be_zero)
+# print(' ')
+
+calc_model = np.array(calc_model)
 # print(calc_model)
+
 # print(dist)
 # print(angle)
+print(calc_model)
+# df_res_from_demo = pd.
+# df_1 = pd.DataFrame(calc_model-res_from_demonstrator)
+# df_1.to_excel('data/excel/calc_model.xlsx')
+R = np.matrix([[   0.079291  ,  0.990584  , -0.096234],
+ [  -0.990827   , 0.086483  ,  0.099382],
+ [   0.106621  ,  0.090922  ,  0.991638]])
+
+Rt = np.transpose(R)
+shouldBeIdentity = np.dot(Rt, R)
+I = np.identity(3, dtype = R.dtype)
+n = np.linalg.norm(I - shouldBeIdentity)
+print(n)
+print(shouldBeIdentity)
