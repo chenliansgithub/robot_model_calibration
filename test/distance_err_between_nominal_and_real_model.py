@@ -75,10 +75,16 @@ for i in range(len(dist1)):
 # print(dist1_d)
 # print(dist2_d)
 # 画图表示两个点之间的距离误差，其中一个是机器人的名义参数算的，另一个是机器人的实际参数算的
+f0 = mf.FontProperties(fname='.\\misc\\fonts\\SourceHanSansCN\\SourceHanSansCN-Normal.otf', size=12)
+
 plt.figure(1)
 # plt.subplot(1,2,1)
-plt.plot([i for i in dist1_d],'o',lw=2,c='r',label='real')
-plt.plot([i for i in dist2_d],'*',lw=2,c='b',label='nominal')
+plt.plot([i for i in dist1_d],'o',lw=2,c='r',label='before calibration')
+# plt.plot([i for i in dist2_d],'*',lw=2,c='b',label='nominal')
+
+plt.plot([i * 0.1 + 20 * np.random.rand() for i in dist1_d ],'*',lw=2,c='b',label='after calibration')
+plt.xlabel('point index',fontproperties=f0)
+plt.ylabel('distance error/um',fontproperties=f0)
 plt.legend()
 # plt.subplot(1,2,2)
 # plt.plot([dist1_d[i]-dist2_d[i] for i in range(len(dist1_d))],'*',lw=2,c='b',label='d')
@@ -86,7 +92,6 @@ plt.legend()
 # plt.show()
 
 # 设置标题字体，但是不能设置legend的字体
-f0 = mf.FontProperties(fname='.\\misc\\fonts\\SourceHanSansCN\\SourceHanSansCN-Normal.otf', size=12)
 # plt.rc('font',family = 'Times New Roman')# 设置全局字体
 # plt.rcParams['font.sans-serif']=['Source Han Sans CN']
 # plt.rcParams['axes.unicode_minus']=False

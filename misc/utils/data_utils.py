@@ -24,4 +24,7 @@ def ReadParameters():
     return df_theta, df_dh_nominal, df_dh_delta
 
 if __name__ == '__main__':
-    ReadParameters()
+    df_theta,df_nominal,df_dh_delta=ReadParameters()
+    print(df_theta,df_nominal,df_dh_delta,sep='\n')
+    print(df_dh_delta+df_nominal,sep='\n')
+    print(df_theta.ndim,type(df_theta),type(df_nominal),type(df_dh_delta),sep='\n')
