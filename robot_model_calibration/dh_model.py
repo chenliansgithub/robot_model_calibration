@@ -8,6 +8,7 @@ class RobotDHModel():
         '''
         :param dh_model: DH参数
         :param theta: 误差角度1x6
+        弧度制
         '''
         self.theta = dh_model[:, 0]
         self.d = dh_model[:, 1]
@@ -64,39 +65,43 @@ class RobotDHModel():
         [0, 0, 0, 1]
         ])
     #计算系数k1,k2,k3
-    def GetK(self):
+    def GetK(self,theta):
+        theta = self.theta+theta
         k1 = [0]*6
         k2 = [0]*6
         k3 = [0]*6
         for i in range(6):
-            k1[i]=np.array([-self.d[i]*np.sin(self.theta[i]),self.d[i]*np.cos(self.theta[i]),0])
-            k2[i]=np.array([np.cos(self.theta[i]),np.sin(self.theta[i]),0])
+            k1[i]=np.array([-self.d[i]*np.sin(theta[i]),self.d[i]*np.cos(theta[i]),0])
+            k2[i]=np.array([np.cos(theta[i]),np.sin(theta[i]),0])
             k3[i]=np.array([0,0,1])
         return k1,k2,k3
     # 得到T[i]和W[i]
-    def GetT(self,i):
+    def GetT(self,theta):
+        theta = self.theta+theta
         T=[0]*6
         for i in range(6):
-            T[i] = self.RotZ(self.theta[i]) @ self.TransZ(self.d[i]) @ self.TransX(self.a[i]) @ self.RotX(self.alpha[i]) @ self.RotY(self.beta[i])
-        return T[i]
-    def GetW(self,i):
-        W=[1]*6
+            T[i] = self.RotZ(theta[i]) @ self.TransZ(self.d[i]) @ self.TransX(self.a[i]) @ self.RotX(self.alpha[i])
+        return T
+    def GetW(self,theta):
+        W=[np.eye(4)]*6
         for i in range(6):
             for j in range(6-i):
-                W[i] = W[i] @ self.GetT(j)
-        return W[i]
+                W[i] = W[i] @ self.GetT(theta)[j]
+        return W
     
     #[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24]
-    def GetError(self):
-        k1,k2,k3 = self.GetK()
-        W = self.GetW()
+    def GetErrorJacobian(self,theta):
+        k1,k2,k3 = self.GetK(theta)
+        W = self.GetW(theta)
         jacobian = np.zeros((3,24))
+        # print(jacobian)
         for i in range(6):
             for j in range(3):
-                jacobian[j,4*i]=np.cross(W[i][0:3,3],W[i][0:3,j])@k3[i]
-                jacobian[j,4*i+1]=W[i][0:3,j]@k3[i]
-                jacobian[j,4*i+2]=W[i][0:3,j]@k2[i]
-                jacobian[j,4*i+3]=(W[i][0:3,j]+np.cross(W[i][0:3,3],W[i][0:3,j]))
+                # print(W[i][0:3,j].T,W[i][0:3,3].T,sep='\n')
+                jacobian[j,4*i]=np.cross(W[i][0:3,3].T,W[i][0:3,j].T)@k3[i]
+                jacobian[j,4*i+1]=W[i][0:3,j].T@k3[i]
+                jacobian[j,4*i+2]=W[i][0:3,j].T@k2[i]
+                jacobian[j,4*i+3]=W[i][0:3,j].T@k1[i]+np.cross(W[i][0:3,3].T,W[i][0:3,j].T)@k2[i]
         return jacobian
     
     def GetFCS(self):

@@ -16,7 +16,8 @@ def ReadParameters():
 
     '''
     df_theta = pd.read_excel('data/excel/theta_table.xlsx', header=None)
-    df_theta = df_theta.to_numpy()
+    # 转换成弧度制
+    df_theta = df_theta.to_numpy() * np.pi / 180
     # Read the nominal D-H parameters.
     df_dh_nominal = pd.read_excel('data/excel/dh_original.xlsx').to_numpy()
     # Read the error of D-H model, theta,alpha,beta are in radian system.

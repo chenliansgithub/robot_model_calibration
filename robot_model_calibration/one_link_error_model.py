@@ -66,13 +66,19 @@ if __name__ == "__main__":
     Delta_alpha_i = sym.Symbol('Delta_alpha_i')
 
     T_i = RotZ(theta_i) * TransZ(d_i) * TransX(a_i) * RotX(alpha_i)
+    # print(sym.latex(sym.simplify(T_i)))
     T_i_inv = Inv_Ti(T_i)
+    # print(sym.latex(sym.simplify(T_i_inv)))
 
     Ti_diff_theta_i = sym.diff(T_i,theta_i)
     Ti_diff_d_i = sym.diff(T_i,d_i)
     Ti_diff_a_i = sym.diff(T_i,a_i)
     Ti_diff_alpha_i = sym.diff(T_i,alpha_i)
     
+    # print(sym.latex(sym.simplify(Ti_diff_theta_i)))
+    # print(sym.latex(sym.simplify(Ti_diff_d_i)))
+    # print(sym.latex(sym.simplify(Ti_diff_a_i)))
+    # print(sym.latex(sym.simplify(Ti_diff_alpha_i)))
     A_theta_i = Ti_diff_theta_i * T_i_inv
     A_d_i = Ti_diff_d_i * T_i_inv
     A_a_i = Ti_diff_a_i * T_i_inv
